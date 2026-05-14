@@ -12,8 +12,10 @@ constexpr uint8_t SYNC_WORD[SYNC_WORD_LEN] = {
 };
 
 constexpr int PACKET_DATA_SIZE = 72;
+constexpr int PACKET_IMAGE_DATA_SIZE = 68;
 constexpr int CRC_SIZE = 2;
 constexpr int PACKET_SIZE = PACKET_DATA_SIZE + CRC_SIZE;
+constexpr int PACKET_IMAGE_SIZE = PACKET_IMAGE_DATA_SIZE + CRC_SIZE;
 
 enum class State { SEARCHING, COLLECTING };
 

@@ -1,4 +1,6 @@
 #include "geoscandemod.h"
+#include "geoscanCRC.h
+#include "geoscanPacketProcessor.h"
 #include <QDebug>
 #include <tuple>
 
@@ -112,26 +114,21 @@ void GeoscanDemod::onPacketReady(const std::vector<uint8_t>& packet) {
 
     Scrambler::descramblePN9(descrambled_packet);
 
-    //Проверка CRC
-    uint16_t receivedCrc = 0;
-    receivedCrc |= (descrambled_packet[packet_size-2] << 8);
-    receivedCrc |= descrambled_packet[packet_size-1];
-    uint16_t crc = 0xFFFF;
-    for (uint16_t i = 0; i < packet_size - 2; i++) {
-        crc ^= (descrambled_packet[i] << 8);
-        for (uint16_t j = 0; j < 8; j++) {
-            if (crc & 0x8000) {
-                crc = (crc << 1) ^ 0x8005;
-            }
-            else {
-                crc <<= 1;
-            }
-        }
+    PacketType packet_type = PacketProccessor::process(packet);
+    switch (packet_type){
+    case StandartPacket:
+        //Тут декодер стандартного пакета
+        break;
+    case ImagePacket:
+        //Тут декодер изображения пакета
+        break
+    default:
+        //Короткий пакет(на отброс)
     }
 
-    if(crc != receivedCrc) {
-        qDebug() << "CRC Failed";
+    //Проверка CRC
+    if (!CRC::check(descrambled_packet)) {
         return;
     }
-    qDebug() << "CRC Completed";
+
 }
