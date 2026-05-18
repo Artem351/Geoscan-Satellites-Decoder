@@ -4,22 +4,22 @@
 #include <vector>
 #include <QDebug>
 
-int PacketProccessor::process(const std::vector<uint8_t>& packet){
+ProcessedPacket PacketProccessor::process(const std::vector<uint8_t>& packet){
     ProcessedPacket result;
 
     if (packet.size() < PACKET_IMAGE_SIZE) {
         qDebug() << "Packet dropped: too short, size:"
-                 << static_cast<int>(scrambledPacket.size());
+                 << static_cast<int>(packet.size());
         return result;
     }
 
     // Пробуем image 70 байт
-    if (tryCandidate(scrambledPacket, PACKET_IMAGE_SIZE, PacketType::ImagePacket, result)) {
+    if (tryCandidate(packet, PACKET_IMAGE_SIZE, PacketType::ImagePacket, result)) {
         return result;
     }
 
     // Пробуем обычный пакет 74 байта
-    if (tryCandidate(scrambledPacket, PACKET_IMAGE_SIZE, PacketType::StandartPacket, result)) {
+    if (tryCandidate(packet, PACKET_IMAGE_SIZE, PacketType::StandartPacket, result)) {
         return result;
     }
 
@@ -28,19 +28,16 @@ int PacketProccessor::process(const std::vector<uint8_t>& packet){
 }
 
 
-bool PacketProcessor::tryCandidate(const std::vector<uint8_t>& scrambledPacket,
+bool PacketProccessor::tryCandidate(const std::vector<uint8_t>& packet,
                                    int candidateSize,
                                    PacketType type,
                                    ProcessedPacket& out){
                                     
-    if (scrambledPacket.size() < static_cast<size_t>(candidateSize)) {
+    if (packet.size() < static_cast<size_t>(candidateSize)) {
         return false;
     }
 
-    std::vector<uint8_t> candidate(
-        scrambledPacket.begin(),
-        scrambledPacket.begin() + candidateSize
-    );
+    std::vector<uint8_t> candidate(packet.begin(), packet.begin() + candidateSize);
 
     Scrambler::descramblePN9(candidate);
 
@@ -53,7 +50,7 @@ bool PacketProcessor::tryCandidate(const std::vector<uint8_t>& scrambledPacket,
 
     if (type == PacketType::ImagePacket) {
         qDebug() << "Valid IMAGE packet, size" << candidateSize;
-    } else if (type == PacketType::StandardPacket) {
+    } else if (type == PacketType::StandartPacket) {
         qDebug() << "Valid STANDARD packet, size" << candidateSize;
     }
 

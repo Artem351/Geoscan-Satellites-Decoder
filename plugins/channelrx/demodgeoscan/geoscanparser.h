@@ -16,7 +16,7 @@ constexpr std::size_t IMAGE_HEADER_SIZE = 5;
 constexpr std::size_t IMAGE_DATA_SIZE = 53;
 constexpr uint32_t    IMAGE_SYNC_WORD = 0x316f6b6f;
 
-struct GeoscanacketType1 {
+struct GeoscanPacketType1 {
     std::array<uint8_t, AX25_SIZE> ax25;
     uint8_t id = 0;
     std::array<uint8_t, EPS_SIZE> eps;
@@ -35,7 +35,7 @@ struct GeoscanPacketImage {
 
 class GeoscanParser {
 public:
-    static bool parseType1(const ProcessedPacket& packet, GeoscanacketType1& out);
+    static bool parseType1(const ProcessedPacket& packet, GeoscanPacketType1& out);
     static bool parseImage(const ProcessedPacket& packet, GeoscanPacketImage& out);
 
 private:

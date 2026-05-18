@@ -1,5 +1,5 @@
 #include "geoscandemod.h"
-#include "geoscanCRC.h
+#include "geoscanCRC.h"
 #include "geoscanPacketProcessor.h"
 #include "geoscanparser.h"
 #include <QDebug>
@@ -114,36 +114,40 @@ void GeoscanDemod::onPacketReady(const std::vector<uint8_t>& packet) {
     ProcessedPacket processed_packet = PacketProccessor::process(packet);
 
     switch (processed_packet.type){
-    case PacketType::StandartPacket
+    case PacketType::StandartPacket:{
 
-        GeoscanPacketType1 parsed;
+        GeoscanPacketType1 parsed_type1;
 
-        if (!GeoscanParser::parseType1(processed.bytes, parsed)) {
+        if (!GeoscanParser::parseType1(processed_packet, parsed_type1)) {
             qDebug() << "Standard packet parse failed";
             return;
         }
 
-        qDebug() << "Standard packet parsed, id:" << parsed.id;
+        qDebug() << "Standard packet parsed, id:" << parsed_type1.id;
         break;
+    }
 
-    case PacketType::ImagePacket:
+    case PacketType::ImagePacket:{
 
-        GeoscanPacketImage parsed;
+        GeoscanPacketImage parsed_image;
 
-        if (!GeoscanParser::parseImage(processed.bytes, parsed)) {
+        if (!GeoscanParser::parseImage(processed_packet, parsed_image)) {
             qDebug() << "Image packet parse failed";
             return;
         }
 
-        qDebug() << "Image packet parsed, id:" << parsed.id;
+        qDebug() << "Image packet parsed, file number:" << parsed_image.fileNumber;
         break;
+    }
         
     case PacketType::UnknownPacket:
         //Неизвестный пакет
+        qDebug() << "Unknown packet";
+        break;
     default:
         //Короткий пакет(на отброс)
-        qDebug() << "GeoscanDemod: пакет отброшен";
-        break;с
+        qDebug() << "Packet dropped(too short)";
+        break;
 
     }
 

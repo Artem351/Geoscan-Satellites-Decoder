@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 
-static bool parseType1(const ProcessedPacket& packet, GeoscanacketType1& out){
+bool GeoscanParser::parseType1(const ProcessedPacket& packet, GeoscanPacketType1& out){
     if (packet.bytes.size() != STANDART_PACKET_SIZE) {
             return false;
     }
@@ -36,7 +36,7 @@ static bool parseType1(const ProcessedPacket& packet, GeoscanacketType1& out){
         return pos == STANDART_PACKET_SIZE;
 }
 
-static bool parseImage(const ProcessedPacket& packet, GeoscanPacketImage& out) {
+bool GeoscanParser::parseImage(const ProcessedPacket& packet, GeoscanPacketImage& out) {
     if (packet.bytes.size() != IMAGE_PACKET_SIZE) {
         return false;
     }

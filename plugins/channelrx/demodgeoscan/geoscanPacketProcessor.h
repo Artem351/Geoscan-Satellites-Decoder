@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <cstdint>
+#include "geoscanCorrelator.h"
 
 enum PacketType {StandartPacket, ImagePacket, UnknownPacket};
 
@@ -11,8 +12,6 @@ struct ProcessedPacket {
     std::vector<uint8_t> bytes;
 };
 
-constexpr int PACKET_SIZE = 74;
-constexpr int PACKET_IMAGE_SIZE = 70;
 
 class PacketProccessor{
 public:
