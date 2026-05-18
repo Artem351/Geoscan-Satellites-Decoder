@@ -1,6 +1,7 @@
 #include "geoscandemod.h"
 #include "geoscanCRC.h
 #include "geoscanPacketProcessor.h"
+#include "geoscanparser.h"
 #include <QDebug>
 #include <tuple>
 
@@ -110,25 +111,41 @@ void GeoscanDemod::onPacketReady(const std::vector<uint8_t>& packet) {
     int packet_size = packet.size();
     qDebug() << "GeoscanDemod: получен пакет, байт:" << packet_size;
 
-    std::vector<uint8_t> descrambled_packet = packet;
+    ProcessedPacket processed_packet = PacketProccessor::process(packet);
 
-    Scrambler::descramblePN9(descrambled_packet);
+    switch (processed_packet.type){
+    case PacketType::StandartPacket
 
-    PacketType packet_type = PacketProccessor::process(packet);
-    switch (packet_type){
-    case StandartPacket:
-        //Тут декодер стандартного пакета
+        GeoscanPacketType1 parsed;
+
+        if (!GeoscanParser::parseType1(processed.bytes, parsed)) {
+            qDebug() << "Standard packet parse failed";
+            return;
+        }
+
+        qDebug() << "Standard packet parsed, id:" << parsed.id;
         break;
-    case ImagePacket:
-        //Тут декодер изображения пакета
-        break
+
+    case PacketType::ImagePacket:
+
+        GeoscanPacketImage parsed;
+
+        if (!GeoscanParser::parseImage(processed.bytes, parsed)) {
+            qDebug() << "Image packet parse failed";
+            return;
+        }
+
+        qDebug() << "Image packet parsed, id:" << parsed.id;
+        break;
+        
+    case PacketType::UnknownPacket:
+        //Неизвестный пакет
     default:
         //Короткий пакет(на отброс)
+        qDebug() << "GeoscanDemod: пакет отброшен";
+        break;с
+
     }
 
-    //Проверка CRC
-    if (!CRC::check(descrambled_packet)) {
-        return;
-    }
 
 }

@@ -14,18 +14,12 @@ int PacketProccessor::process(const std::vector<uint8_t>& packet){
     }
 
     // Пробуем image 70 байт
-    if (tryCandidate(scrambledPacket,
-                     PACKET_IMAGE_SIZE,
-                     PacketType::ImagePacket,
-                     result)) {
+    if (tryCandidate(scrambledPacket, PACKET_IMAGE_SIZE, PacketType::ImagePacket, result)) {
         return result;
     }
 
     // Пробуем обычный пакет 74 байта
-    if (tryCandidate(scrambledPacket,
-                     PACKET_SIZE,
-                     PacketType::StandardPacket,
-                     result)) {
+    if (tryCandidate(scrambledPacket, PACKET_IMAGE_SIZE, PacketType::StandartPacket, result)) {
         return result;
     }
 
